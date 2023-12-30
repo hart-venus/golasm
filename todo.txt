@@ -1,0 +1,4 @@
+- [ ] Load scene from file
+- [ ] Save scene to file
+- [ ] Step through and animate scene
+- [ ] edit manually using hjkl keys
