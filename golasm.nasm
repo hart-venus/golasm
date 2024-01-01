@@ -1,7 +1,7 @@
 section .data
-    blackCell    db 0xE2, 0xAC, 0x9B, 0x00 ; black square emoji 
+    blackCell    db ' ', 0x00
     blackCellLen equ $ - blackCell
-    whiteCell    db 0xE2, 0xAC, 0x9C, 0x00 ; white square emoji
+    whiteCell    db '█', 0x00
     whiteCellLen equ $ - whiteCell
     newLine      db 0x0A, 0x00
     newLineLen   equ $ - newLine
@@ -23,17 +23,47 @@ section .text
     _start:
         call printBoard
     exit:
-        mov eax, 60
+        mov eax, 0x3C ; exit syscall
         xor edi, edi ; exit code 0
         syscall
 
 printBoard: 
+    lea rbx, [board]
+    mov cx, boardRows
+    ; push stack frame
+    rowLoop:
+        push cx 
+        mov cx, boardCols
+        colLoop:
+            push cx
 
-    ; print black square emoji
-    mov rax, 1
-    mov rdi, 1
-    mov rsi, blackCell
-    mov rdx, blackCellLen
-    syscall
+            mov al, [rbx]
+            cmp al, aliveRepr
+            je alive
+            jmp dead
 
-    ret 
+            alive: 
+                mov rax, 1
+                mov rdi, 1 ; stdout
+                mov rsi, whiteCell
+                mov rdx, whiteCellLen
+                ;syscall
+                jmp next
+
+            dead: 
+                mov rax, 1
+                mov rdi, 1
+                mov rsi, whiteCell
+                mov rdx, whiteCellLen
+                ;syscall
+                jmp next
+
+
+            next:
+                inc rbx ; next cell
+                pop cx
+        loop colLoop 
+
+        pop cx
+    loop rowLoop
+    ret
