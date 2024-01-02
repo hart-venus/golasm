@@ -1,13 +1,15 @@
 section .data
-    blackCell    db ' ', 0x00
+    blackCell    db 'x', 0x00
     blackCellLen equ $ - blackCell
-    whiteCell    db 'x'
+    whiteCell    db ' '
     whiteCellLen equ $ - whiteCell
     newLine      db 0x0A, 0x00
     newLineLen   equ $ - newLine
+    endLine      db 10, 0x00 ; end of line
+    endLineLen   equ $ - endLine
 
-    boardRows equ 20
-    boardCols equ 20
+    boardRows equ 5
+    boardCols equ 5
     boardSize equ (boardRows * boardCols)
 
     aliveRepr equ 0x01 ; alive cell representation
@@ -54,16 +56,21 @@ printBoard:
             dead: 
                 mov rax, 1
                 mov rdi, 1
-                mov rsi, whiteCell
-                mov rdx, whiteCellLen
+                mov rsi, blackCell
+                mov rdx, blackCellLen
                 syscall
                 jmp next
 
 
             next:
-                ;inc rbx ; next cell
+                inc rbx ; next cell
                 pop rcx
         loop colLoop 
+        mov rax, 1
+        mov rdi, 1
+        mov rsi, endLine
+        mov rdx, endLineLen
+        syscall
 
         pop rcx
     loop rowLoop
