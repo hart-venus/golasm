@@ -1,7 +1,7 @@
 section .data
     blackCell    db ' ', 0x00
     blackCellLen equ $ - blackCell
-    whiteCell    db '█', 0x00
+    whiteCell    db 'x'
     whiteCellLen equ $ - whiteCell
     newLine      db 0x0A, 0x00
     newLineLen   equ $ - newLine
@@ -29,13 +29,14 @@ section .text
 
 printBoard: 
     lea rbx, [board]
+    xor rcx, rcx
     mov cx, boardRows
     ; push stack frame
     rowLoop:
-        push cx 
+        push rcx 
         mov cx, boardCols
         colLoop:
-            push cx
+            push rcx
 
             mov al, [rbx]
             cmp al, aliveRepr
@@ -47,7 +48,7 @@ printBoard:
                 mov rdi, 1 ; stdout
                 mov rsi, whiteCell
                 mov rdx, whiteCellLen
-                ;syscall
+                syscall
                 jmp next
 
             dead: 
@@ -55,15 +56,15 @@ printBoard:
                 mov rdi, 1
                 mov rsi, whiteCell
                 mov rdx, whiteCellLen
-                ;syscall
+                syscall
                 jmp next
 
 
             next:
-                inc rbx ; next cell
-                pop cx
+                ;inc rbx ; next cell
+                pop rcx
         loop colLoop 
 
-        pop cx
+        pop rcx
     loop rowLoop
     ret
